@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="card search-card">
+    <div class="card-header">
+      <i class="fas fa-list"></i>
+      <h2>検索結果</h2>
+    </div>
+    {% if results %}
+      <div class="results-header"><i class="fas fa-list"></i><h3>検索結果一覧</h3></div>
+      <ul class="search-results">
+        {% for shelter in results %}
+        <li class="shelter-item">
+          <div class="shelter-icon">
+            <i class="fas fa-building"></i>
+          </div>
+          <div class="shelter-info">
+            <div class="shelter-name">{{ shelter.name }}</div>
+            <div class="shelter-details">
+              <div class="detail-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ shelter.district }}</span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-home"></i>
+                <span>{{ shelter.address }}</span>
+              </div>
+              {% if shelter.phone %}
+              <div class="detail-item">
+                <i class="fas fa-phone"></i>
+                <span>{{ shelter.phone }}</span>
+              </div>
+              {% endif %}
+              {% if shelter.facilities %}
+              <div class="detail-item">
+                <i class="fas fa-cog"></i>
+                <span>{{ shelter.facilities }}</span>
+              </div>
+              {% endif %}
+              <div class="shelter-badges">
+                {% if shelter.designated_shelter %}
+                <span class="badge designated"><i class="fas fa-shield-alt"></i> 指定避難所</span>
+                {% endif %}
+                {% if shelter.pet_space %}
+                <span class="badge pet"><i class="fas fa-paw"></i> ペット可</span>
+                {% endif %}
+                {% if shelter.barrier_free_toilet %}
+                <span class="badge barrier-free"><i class="fas fa-wheelchair"></i> バリアフリー</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="shelter-map">
+            <a href="https://www.google.com/maps/search/?api=1&query={{ shelter.lat }},{{ shelter.lon }}" target="_blank" class="map-link">
+              <i class="fas fa-map"></i> 地図
+            </a>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="no-results"><i class="fas fa-info-circle"></i>該当する避難所が見つかりませんでした</div>
+    {% endif %}
+    
+    <!-- ナビゲーションボタン -->
+    <div class="navigation-buttons">
+      <a href="/shelter_search" class="nav-button back-to-search">
+        <i class="fas fa-search"></i>
+        検索画面に戻る
+      </a>
+      <a href="/" class="nav-button back-to-home">
+        <i class="fas fa-home"></i>
+        トップページへ戻る
+      </a>
+    </div>
+  </div>
+</div>
+<!-- Font Awesome の読み込み -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+.dashboard-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+.card {
+  background: linear-gradient(135deg, #e3f0ff 0%, #f9f9f9 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(74,144,226,0.10);
+  padding: 36px 32px 32px 32px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.card-header i {
+  margin-right: 15px;
+  font-size: 2em;
+  color: #4a90e2;
+}
+.card-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 2em;
+  font-weight: 700;
+}
+.results-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #4a90e2;
+}
+.results-header i {
+  color: #4a90e2;
+  font-size: 1.2em;
+  margin-right: 10px;
+}
+.results-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+.search-results {
+  margin-top: 18px;
+  padding-left: 0;
+  list-style: none;
+}
+.shelter-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 18px 16px;
+  border-bottom: 1px solid #e0e7ef;
+  background: #fff;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(74,144,226,0.04);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.shelter-item:hover {
+  background: #f0f7ff;
+  box-shadow: 0 4px 16px rgba(74,144,226,0.10);
+}
+.shelter-icon {
+  margin-right: 18px;
+  color: #4a90e2;
+  font-size: 1.6em;
+  min-width: 32px;
+  text-align: center;
+  margin-top: 4px;
+}
+.shelter-info {
+  flex: 1;
+}
+.shelter-name {
+  color: #333;
+  font-weight: 600;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+.shelter-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.detail-item {
+  color: #666;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.detail-item i {
+  color: #4a90e2;
+  font-size: 1em;
+  min-width: 16px;
+}
+.shelter-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge.designated {
+  background: #e8f5e8;
+  color: #2d5a2d;
+}
+.badge.pet {
+  background: #fff3e0;
+  color: #8b4513;
+}
+.badge.barrier-free {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.shelter-map {
+  margin-left: 18px;
+}
+.map-link {
+  background: #4a90e2;
+  color: #fff;
+  padding: 7px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.98em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+.map-link:hover {
+  background: #357abd;
+}
+.no-results {
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 10px;
+  font-size: 1.1em;
+  margin-top: 24px;
+  box-shadow: 0 2px 8px rgba(74,144,226,0.04);
+}
+.no-results i {
+  margin-right: 10px;
+  color: #4a90e2;
+}
+.search-button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  font-weight: 600;
+}
+.search-button:hover {
+  background: #357abd;
+}
+
+.navigation-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  justify-content: center;
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  flex: 1;
+  justify-content: center;
+  max-width: 200px;
+}
+
+.back-to-search {
+  background: #4a90e2;
+  color: white;
+}
+
+.back-to-search:hover {
+  background: #357abd;
+  text-decoration: none;
+  color: white;
+}
+
+.back-to-home {
+  background: #6c757d;
+  color: white;
+}
+
+.back-to-home:hover {
+  background: #545b62;
+  text-decoration: none;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 10px;
+    margin: 20px auto;
+  }
+  .card {
+    padding: 16px;
+  }
+  .card-header h2 {
+    font-size: 1.3em;
+  }
+  .shelter-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 12px;
+  }
+  .shelter-icon {
+    margin-right: 12px;
+    margin-bottom: 8px;
+  }
+  .shelter-name {
+    font-size: 1.0em;
+  }
+  .detail-item {
+    font-size: 0.85em;
+  }
+  .shelter-badges {
+    margin-top: 8px;
+  }
+  .badge {
+    font-size: 0.7em;
+    padding: 2px 6px;
+  }
+  .shelter-map {
+    margin-left: 0;
+    margin-top: 10px;
+    align-self: stretch;
+  }
+  .map-link {
+    justify-content: center;
+    width: 100%;
+  }
+  .navigation-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .nav-button {
+    max-width: none;
+  }
+}
+</style>
+{% endblock %}

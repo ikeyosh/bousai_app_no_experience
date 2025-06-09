@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- 避難所検索 -->
+  <div class="card search-card">
+    <div class="card-header">
+      <i class="fas fa-search"></i>
+      <h2>避難所検索</h2>
+    </div>
+    <div class="search-description">
+      <p>お住まいの地区の避難所を検索できます。地区を選択してください。</p>
+    </div>
+    
+    <!-- 検索結果なしのメッセージ -->
+    {% if no_results %}
+    <div class="alert alert-warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      {% if searched_district %}
+        「{{ searched_district }}」に該当する避難所が見つかりませんでした。
+      {% else %}
+        該当する避難所が見つかりませんでした。
+      {% endif %}
+      <br>検索条件を変更して再度お試しください。
+    </div>
+    {% endif %}
+    
+    <!-- エラーメッセージ -->
+    {% if error %}
+    <div class="alert alert-error">
+      <i class="fas fa-exclamation-circle"></i> {{ message }}
+    </div>
+    {% endif %}
+    
+    <form id="searchForm" class="search-form" method="post" action="/shelter_search">
+      <div class="form-row">
+        <div class="form-group">
+          <label>地区 <span class="required">*</span></label>
+          <select id="district" name="district" class="form-input">
+            <option value="">地区を選択してください</option>
+            {% for district in districts %}
+            <option value="{{ district }}" {% if searched_district == district %}selected{% endif %}>{{ district }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="button-group">
+        <button type="submit" class="main-button">
+          <i class="fas fa-search"></i> 検索
+        </button>
+        <a href="/all_shelters" class="main-button alt">
+          <i class="fas fa-list"></i> 全施設一覧
+        </a>
+      </div>
+    </form>
+    <ul id="results" class="search-results"></ul>
+  </div>
+  
+  <!-- ダッシュボードに戻るボタン -->
+  <div class="back-button-container">
+    <a href="/" class="back-button">
+      <i class="fas fa-arrow-left"></i>
+      ダッシュボードに戻る
+    </a>
+  </div>
+</div>
+
+<!-- Font Awesome の読み込み -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+.dashboard-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 30px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header i {
+  margin-right: 15px;
+  font-size: 1.8em;
+  color: #4a90e2;
+}
+
+.card-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.8em;
+}
+
+.search-description {
+  margin-bottom: 25px;
+  color: #666;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #444;
+}
+
+.form-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.main-button {
+  background: #2952a3;
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background 0.3s;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.main-button:hover {
+  background: #16305c;
+  color: #fff;
+}
+
+.main-button.alt {
+  background: #6c757d;
+}
+
+.main-button.alt:hover {
+  background: #545b62;
+}
+
+.search-results {
+  margin-top: 25px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #4a90e2;
+}
+
+.results-header i {
+  color: #4a90e2;
+  font-size: 1.2em;
+  margin-right: 10px;
+}
+
+.results-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.shelter-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+}
+
+.shelter-item:hover {
+  background-color: #f8f9fa;
+}
+
+.shelter-item i {
+  color: #4a90e2;
+  font-size: 1.2em;
+  margin-right: 15px;
+}
+
+.shelter-info {
+  flex: 1;
+}
+
+.shelter-name {
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.shelter-address {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.no-results {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.no-results i {
+  margin-right: 10px;
+  color: #4a90e2;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.alert-warning {
+  color: #856404;
+  background: #fff3cd;
+  border-color: #ffeaa7;
+}
+
+.alert-error {
+  color: #721c24;
+  background: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.back-button-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background: #545b62;
+  text-decoration: none;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 10px;
+    margin: 20px auto;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .card-header h2 {
+    font-size: 1.5em;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,565 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- 避難所マップ -->
+  <div class="map-card">
+    <div class="map-title">
+      <i class="fas fa-map-marker-alt"></i>
+      避難所マップ
+    </div>
+    <div class="map-container">
+      <div id="shelterMap"></div>
+      <div class="map-legend">
+        <div class="legend-item">
+          <div class="legend-marker current"></div>
+          <span>現在地</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-marker shelter"></div>
+          <span>避難所</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 気象警報・注意報 -->
+  <div class="weather-warning-card">
+    <div class="weather-title">
+      <div>
+        <i class="fas fa-cloud-sun"></i>
+        藤沢市 気象警報・注意報
+      </div>
+      <div class="auto-update-indicator">
+        <i class="fas fa-sync-alt" id="updateIcon"></i>
+        <span>10分おき自動更新</span>
+      </div>
+    </div>
+    <div id="weatherContent">
+      {% if weather_warnings %}
+        <div class="weather-info">
+          <div class="weather-info-header">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ weather_warnings.area_name }}</span>
+          </div>
+          {% if weather_warnings.warnings %}
+            <div class="weather-warnings-list">
+              {% for warning in weather_warnings.warnings %}
+                <div class="warning-item">
+                  {% if '特別警報' in warning.name %}
+                    <div class="warning-badge emergency">
+                      <i class="fas fa-exclamation-triangle"></i>
+                      {{ warning.name }}
+                    </div>
+                  {% elif '警報' in warning.name %}
+                    <div class="warning-badge warning">
+                      <i class="fas fa-exclamation-circle"></i>
+                      {{ warning.name }}
+                    </div>
+                  {% else %}
+                    <div class="warning-badge advisory">
+                      <i class="fas fa-info-circle"></i>
+                      {{ warning.name }}
+                    </div>
+                  {% endif %}
+                  <div class="warning-status">
+                    {% if warning.status == '発表' %}
+                      🆕 新規発表
+                    {% else %}
+                      🔄 継続中
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="no-warnings">
+              <i class="fas fa-check-circle"></i>
+              現在、警報・注意報は発表されていません
+            </div>
+          {% endif %}
+          <div class="weather-info-footer">
+            <div class="update-time-item">
+              <i class="far fa-clock"></i>
+              <span>最終確認: <span id="lastFetchTime">{{ weather_warnings.last_fetch_time if weather_warnings.last_fetch_time else '読み込み中...' }}</span></span>
+            </div>
+            <div class="update-time-item">
+              <i class="fas fa-satellite-dish"></i>
+              <span>気象庁最終発表: {{ weather_warnings.report_time }}</span>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="weather-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          気象情報の取得に失敗しました
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet の読み込み -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+.dashboard-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.map-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(74,144,226,0.10);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.map-title {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #2952a3;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-title i {
+  font-size: 1.1em;
+}
+
+/* 気象警報・注意報のスタイル */
+.weather-warning-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(74,144,226,0.10);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.weather-title {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #2952a3;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.weather-title > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auto-update-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75em;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.auto-update-indicator #updateIcon {
+  animation: none;
+}
+
+.auto-update-indicator #updateIcon.rotating {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.weather-title i {
+  font-size: 1.1em;
+}
+
+.weather-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.weather-info-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 12px;
+}
+
+.weather-warnings-list {
+  margin-bottom: 16px;
+}
+
+.warning-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.warning-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.warning-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.warning-badge.emergency {
+  background: #dc3545;
+  color: white;
+}
+
+.warning-badge.warning {
+  background: #fd7e14;
+  color: white;
+}
+
+.warning-badge.advisory {
+  background: #ffc107;
+  color: #212529;
+}
+
+.warning-status {
+  font-size: 0.85em;
+  color: #6c757d;
+}
+
+.no-warnings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #28a745;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.weather-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #dc3545;
+  font-weight: 600;
+  padding: 16px;
+  background: #f8d7da;
+  border-radius: 8px;
+}
+
+.weather-info-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-top: 12px;
+}
+
+.update-time-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-container {
+  position: relative;
+}
+
+#shelterMap {
+  height: 300px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #e0e6ed;
+}
+
+.map-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 12px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.legend-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.legend-marker.current {
+  background: #4a90e2;
+}
+
+.legend-marker.shelter {
+  background: #ff6b35;
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 10px;
+    margin: 20px auto;
+  }
+
+  .map-card, .weather-warning-card {
+    padding: 20px 16px;
+    margin-bottom: 20px;
+  }
+
+  .map-title, .weather-title {
+    font-size: 1.2em;
+  }
+
+  #shelterMap {
+    height: 250px;
+  }
+
+  .map-legend {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 地図の初期化（東京都庁周辺を中心に設定）
+    const map = L.map('shelterMap').setView([35.6895, 139.6917], 11);
+    
+    // OpenStreetMapタイルを追加
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // マーカーを格納する配列
+    let allMarkers = [];
+    
+    // 避難所データをAPIから取得（全ての避難所を取得）
+    fetch('/shelters')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('避難所データの取得に失敗しました');
+            }
+            return response.json();
+        })
+        .then(shelters => {
+            console.log('取得した避難所データ:', shelters);
+            
+            // 避難所マーカーを追加
+            shelters.forEach(shelter => {
+                // 緯度経度が存在する場合のみマーカーを追加
+                if (shelter.lat && shelter.lon) {
+                    const marker = L.circleMarker([shelter.lat, shelter.lon], {
+                        radius: 8,
+                        fillColor: '#ff6b35',
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map);
+                    
+                    // ポップアップの内容を作成
+                    const popupContent = `
+                        <div style="font-size: 14px; line-height: 1.4; min-width: 200px;">
+                            <strong>${shelter.name}</strong><br>
+                            <span style="color: #666;">📍 ${shelter.pref} ${shelter.city}</span><br>
+                            ${shelter.address ? `<span style="color: #666;">🏠 ${shelter.address}</span><br>` : ''}
+                            ${shelter.capacity && shelter.capacity > 0 ? `<br>収容人数: ${shelter.capacity}人` : ''}
+                            ${shelter.phone ? `<br>📞 ${shelter.phone}` : ''}
+                            ${shelter.facilities ? `<br>設備: ${shelter.facilities}` : ''}
+                        </div>
+                    `;
+                    
+                    marker.bindPopup(popupContent);
+                    allMarkers.push(marker);
+                } else {
+                    console.log('座標データがない避難所:', shelter.name);
+                }
+            });
+            
+            // 全ての避難所マーカーが表示される範囲に地図を調整
+            if (allMarkers.length > 0) {
+                const group = new L.featureGroup(allMarkers);
+                map.fitBounds(group.getBounds().pad(0.1));
+                console.log(`${allMarkers.length}個の避難所マーカーを表示しました`);
+            } else {
+                console.log('表示可能な避難所マーカーがありません');
+            }
+        })
+        .catch(error => {
+            console.error('避難所データの読み込みエラー:', error);
+            // エラー時はデフォルトの東京周辺を表示
+            map.setView([35.6895, 139.6917], 11);
+        });
+    
+    // 現在地を取得して表示（オプション）
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const currentLat = position.coords.latitude;
+            const currentLon = position.coords.longitude;
+            
+            const currentLocationMarker = L.circleMarker([currentLat, currentLon], {
+                radius: 10,
+                fillColor: '#4a90e2',
+                color: '#fff',
+                weight: 3,
+                opacity: 1,
+                fillOpacity: 1
+            }).addTo(map);
+            
+            currentLocationMarker.bindPopup('📍 現在地');
+            
+            console.log('現在地を表示しました:', currentLat, currentLon);
+        }, function(error) {
+            console.log('位置情報の取得に失敗しました:', error.message);
+        });
+    }
+
+    // 気象警報・注意報の自動更新機能
+    function updateWeatherWarnings() {
+        const updateIcon = document.getElementById('updateIcon');
+        const lastFetchTimeElement = document.getElementById('lastFetchTime');
+        
+        // 更新アイコンを回転させる
+        updateIcon.classList.add('rotating');
+        
+        fetch('/api/weather_warnings')
+            .then(response => response.json())
+            .then(data => {
+                console.log('気象情報を更新しました:', data);
+                
+                // コンテンツを更新
+                updateWeatherContent(data);
+                
+                // 取得時刻を更新
+                if (lastFetchTimeElement) {
+                    lastFetchTimeElement.textContent = data.last_fetch_time || '更新失敗';
+                }
+            })
+            .catch(error => {
+                console.error('気象情報の更新に失敗しました:', error);
+                if (lastFetchTimeElement) {
+                    lastFetchTimeElement.textContent = '更新失敗';
+                }
+            })
+            .finally(() => {
+                // 更新アイコンの回転を停止
+                setTimeout(() => {
+                    updateIcon.classList.remove('rotating');
+                }, 1000);
+            });
+    }
+
+    function updateWeatherContent(data) {
+        const weatherContent = document.getElementById('weatherContent');
+        
+        if (data.error) {
+            weatherContent.innerHTML = `
+                <div class="weather-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    気象情報の取得に失敗しました
+                </div>
+            `;
+            return;
+        }
+
+        let warningsHtml = '';
+        
+        if (data.warnings && data.warnings.length > 0) {
+            warningsHtml = '<div class="weather-warnings-list">';
+            data.warnings.forEach(warning => {
+                let badgeClass = 'advisory';
+                let icon = 'fas fa-info-circle';
+                
+                if (warning.name.includes('特別警報')) {
+                    badgeClass = 'emergency';
+                    icon = 'fas fa-exclamation-triangle';
+                } else if (warning.name.includes('警報')) {
+                    badgeClass = 'warning';
+                    icon = 'fas fa-exclamation-circle';
+                }
+
+                const statusText = warning.status === '発表' ? '🆕 新規発表' : '🔄 継続中';
+
+                warningsHtml += `
+                    <div class="warning-item">
+                        <div class="warning-badge ${badgeClass}">
+                            <i class="${icon}"></i>
+                            ${warning.name}
+                        </div>
+                        <div class="warning-status">${statusText}</div>
+                    </div>
+                `;
+            });
+            warningsHtml += '</div>';
+        } else {
+            warningsHtml = `
+                <div class="no-warnings">
+                    <i class="fas fa-check-circle"></i>
+                    現在、警報・注意報は発表されていません
+                </div>
+            `;
+        }
+
+        weatherContent.innerHTML = `
+            <div class="weather-info">
+                <div class="weather-info-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${data.area_name || '藤沢市'}</span>
+                </div>
+                ${warningsHtml}
+                <div class="weather-info-footer">
+                    <div class="update-time-item">
+                        <i class="far fa-clock"></i>
+                        <span>データ取得: <span id="lastFetchTime">${data.last_fetch_time || '更新中...'}</span></span>
+                    </div>
+                    <div class="update-time-item">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>気象庁発表: ${data.report_time || '不明'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 10分（600,000ミリ秒）おきに自動更新
+    setInterval(updateWeatherWarnings, 600000);
+    
+    // ページ読み込み後、5秒後に初回更新（初期データが古い可能性があるため）
+    setTimeout(updateWeatherWarnings, 5000);
+});
+</script>
+{% endblock %}

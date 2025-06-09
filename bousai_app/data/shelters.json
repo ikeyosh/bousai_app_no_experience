@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "name": "御所見小学校",
+    "pref": "神奈川県",
+    "city": "藤沢市",
+    "district": "御所見地区",
+    "address": "打戻1902",
+    "phone": "0466-82-0063",
+    "facilities": "体育館、校庭、備蓄倉庫、AED",
+    "designated_shelter": true,
+    "pet_space": false,
+    "barrier_free_toilet": true,
+    "lat": 35.4033456,
+    "lon": 139.4165907
+  },
+  {
+    "id": 2,
+    "name": "片瀬小学校",
+    "pref": "神奈川県",
+    "city": "藤沢市",
+    "district": "片瀬地区",
+    "address": "片瀬2-14-29",
+    "phone": "0466 (27) 2711",
+    "facilities": "",
+    "designated_shelter": true,
+    "pet_space": true,
+    "barrier_free_toilet": false,
+    "lat": 35.319989,
+    "lon": 139.4875391
+  },
+  {
+    "id": 5,
+    "name": "鵠洋小学校",
+    "pref": "神奈川県",
+    "city": "藤沢市",
+    "district": "鵠沼地区",
+    "address": "鵠沼桜が岡3-16-38",
+    "phone": "0466 (33) 2001",
+    "facilities": "",
+    "designated_shelter": true,
+    "pet_space": false,
+    "barrier_free_toilet": true,
+    "lat": 35.326805646236274,
+    "lon": 139.47459946932096
+  }
+]
