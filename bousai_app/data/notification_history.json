@@ -1,5 +1,26 @@
 [
   {
+    "timestamp": "2025年06月10日 19:04",
+    "area_name": "藤沢市",
+    "report_time": "2025年06月10日 16:46",
+    "warnings": [
+      {
+        "name": "雷注意報",
+        "code": "14",
+        "status": "発表"
+      },
+      {
+        "name": "強風注意報",
+        "code": "15",
+        "status": "継続"
+      }
+    ],
+    "warning_count": 2,
+    "has_emergency": false,
+    "has_warning": false,
+    "has_advisory": true
+  },
+  {
     "timestamp": "2025年06月09日 11:04",
     "area_name": "藤沢市",
     "report_time": "2025年06月07日 16:10",

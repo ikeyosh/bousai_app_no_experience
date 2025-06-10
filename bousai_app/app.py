@@ -32,7 +32,7 @@ FUJISAWA_AREA_CODE = "1420500"  # 藤沢市のエリアコード
 # B) "https://www.jma.go.jp/bosai/warning/data/warning/140000.json"
 # C) [https://www.jma.go.jp/bosai/warning/data/warning/140000.json]
 # D) {https://www.jma.go.jp/bosai/warning/data/warning/140000.json}
-WARNING_URL = 〇〇
+WARNING_URL = "https://www.jma.go.jp/bosai/warning/data/warning/140000.json"
 """ # 第1問：変数
 
 # ────────────────────────────────
@@ -141,7 +141,7 @@ def get_fujisawa_warnings():
                 # D) while
                 # ヒント：「もし〜なら」を指す言葉。
                 # ISO形式の時刻をパース（例: "2025-01-15T04:14:00+09:00"）
-                〇〇 report_datetime.endswith('Z'):
+                if report_datetime.endswith('Z'):
                     # UTC時刻の場合は+9時間してJSTに変換
                     utc_time = datetime.fromisoformat(report_datetime[:-1])
                     jst_time = utc_time + timedelta(hours=9)
@@ -289,19 +289,18 @@ def shelter_search():
             return render_template('shelter_search.html', error=True, message="地区を選択してください。", districts=FUJISAWA_DISTRICTS) # districts をテンプレートに渡す
 
         results = []
-         """ # 第3問：繰り返しについて学ぼう
+        """ # 第3問：繰り返しについて学ぼう
          # 以下のコードの〇〇の中に、A~Dの中から適切なものを選んで貼り付けてください
          # ヒント：リストの中身を「一つずつ」取り出して処理したい場合に使うのは何ですか？
          # A) while
          # B) for
          # C) if
          # D) def
-        〇〇 s in shelters:
+        for s in shelters:
             if district and s.get('district') != district: # pref と city の代わりに district でフィルタリング
                 continue
             results.append(s)
-        """ # 第3問：繰り返し
-
+        
         if not results:
             # 該当する避難所がない場合
             return render_template('shelter_search.html',
@@ -312,6 +311,7 @@ def shelter_search():
         else:
             # 結果がある場合は検索結果ページへ
             return render_template('search_results.html', results=results, searched_district=district) # searched_district をテンプレートに渡す
+        """ # 第3問：繰り返し
 
     # GETリクエストの場合は通常のフォームを表示
     return render_template('shelter_search.html', districts=FUJISAWA_DISTRICTS) # districts をテンプレートに渡す
@@ -348,9 +348,8 @@ def shelter_register():
         # C) {,}
         # D) <,>
         # 必須項目チェック
-        if not all(〇〇name, district, address, latitude, longitude〇〇):
-            return render_template('shelter_register.html', error=True, message="必須項目が入力されていません。", districts=FUJISAWA_DISTRICTS)
-        """ # 第5問：リスト
+        if not all([name, district, address, latitude, longitude]):
+            return render_template('shelter_register.html', error=True, message="必須項目が入力されていません。", districts=FUJISAWA_DISTRICTS)        
 
         # 緯度経度の数値変換とバリデーション
         try:
@@ -363,16 +362,17 @@ def shelter_register():
                 
         except ValueError:
             return render_template('shelter_register.html', error=True, message="緯度・経度は正しい数値で入力してください。", districts=FUJISAWA_DISTRICTS)
-        
+        """ # 第5問：リスト
+            
         # 新しい避難所データを作成
-        """ # 第4問：辞書について学ぼう！
+        """ # 第4問：簡単な機能追加
         # 以下のコードの2つの〇〇の中に、A~Dの中から適切なものを選んで貼り付けてください
         # ヒント：辞書を表現する記号は何ですか？
         # A) [,]
         # B) (,)
         # C) {,}
         # D) <,>
-        new_shelter = 〇〇
+        new_shelter = {
             'id': len(shelters) + 1,
             'name': name,
             'pref': '神奈川県',
@@ -386,7 +386,7 @@ def shelter_register():
             'barrier_free_toilet': barrier_free_toilet,
             'lat': lat,  # 緯度を追加
             'lon': lon   # 経度を追加
-        〇〇
+        }
         """ # 第4問：辞書
         
         # メモリ上のリストに追加

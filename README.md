@@ -26,19 +26,24 @@
 
 ## ファイル構成
 ```
-bousai_app/
-├── app.py                 # メインアプリケーション（穴埋め問題）
-├── requirements.txt       # 必要なライブラリ
-├── data/
-│   ├── shelters.json     # 避難所データ
-│   └── notification_history.json  # 通知履歴
-└── templates/
-    ├── base.html         # ベーステンプレート
-    ├── index.html        # ホームページ
-    ├── weather.html      # 気象情報ページ
-    ├── shelter_search.html    # 避難所検索ページ
-    ├── shelter_register.html  # 避難所登録ページ
-    └── notification.html # 通知ページ
+bousai_app_no_experience/
+├── README.md              # このファイル（プロジェクト概要）
+├── 学習ガイド.md          # 詳細な学習ガイド
+├── 講師用解答集.md        # 講師向け解答とヒント
+└── bousai_app/
+    ├── app.py             # メインアプリケーション（穴埋め問題）
+    ├── requirements.txt   # 必要なライブラリ
+    ├── data/
+    │   ├── shelters.json  # 避難所データ
+    │   └── notification_history.json  # 通知履歴
+    └── templates/
+        ├── base.html      # ベーステンプレート
+        ├── index.html     # ホームページ
+        ├── login.html     # ログインページ
+        ├── shelter_search.html     # 避難所検索ページ
+        ├── shelter_register.html   # 避難所登録ページ
+        ├── search_results.html     # 検索結果ページ
+        └── notification_history.html # 通知履歴ページ
 ```
 
 ## セットアップ手順
