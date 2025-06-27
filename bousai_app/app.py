@@ -16,24 +16,47 @@ FUJISAWA_DISTRICTS = [
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
 
-# 管理者認証情報
-ADMIN_CREDENTIALS = {
-    'admin': 'password123',
-    'manager': 'shelter2025'
-}
+"""# ワーク4（中間）：辞書のかたちを見て、自分で書いてみよう！
+
+        # 辞書（dictionary）は、複数のデータを「キー」と「値」のセットでまとめて管理できる便利な型です。
+        # 下の例のように、{} を使って、改行して複数のデータを書くこともできます。
+
+        # --- 辞書の例（構文） ---
+        # ユーザー情報をまとめる場合：
+        # USER_INFO = {
+        #     'name': 'Tanaka',
+        #     'age': 28,
+        #     'email': 'tanaka@example.com'
+        # }
+
+        # --- あなたのワーク ---
+
+        # 次の条件に合うように、自分で辞書を完成させてください。
+
+        # 【1】変数名は → ADMIN_CREDENTIALS
+        # 【2】'admin' という管理者のパスワードは 'pass123'
+        # 【3】'manager' という管理者のパスワードは 'secret456'
+        # 【4】すべての形式・記号（: , { }）を正しく使いましょう
+
+        # ↓ ここに完成させて書いてください
+
+        ADMIN_CREDENTIALS = ○○
+       """  # ワーク4（中間）
+
 
 # ────────────────────────────────
 # 気象警報・注意報設定
 FUJISAWA_AREA_CODE = "1420500"  # 藤沢市のエリアコード
-""" # 第1問：変数について学ぼう！
-# 以下のコードの〇〇の中に、A~Dの中から適切なものを選んで貼り付けてください
-# ヒント： URLは文字として扱う必要があります。文字を変数に入れるときは何で囲みますか？
-# A) https://www.jma.go.jp/bosai/warning/data/warning/140000.json
-# B) "https://www.jma.go.jp/bosai/warning/data/warning/140000.json"
-# C) [https://www.jma.go.jp/bosai/warning/data/warning/140000.json]
-# D) {https://www.jma.go.jp/bosai/warning/data/warning/140000.json}
-WARNING_URL = "https://www.jma.go.jp/bosai/warning/data/warning/140000.json"
-""" # 第1問：変数
+
+""" # ワーク1 ：変数に値（文字列）を入れてみよう！
+# 以下のコードの変数「WARNING_URL」に、値（文字列：URL)を設定してください。
+# ヒント： URLは「文字列」として扱います。文字を変数に入れるときは"（ダブルコーテーション）で囲みます。
+# URL  ： https://www.jma.go.jp/bosai/warning/data/warning/140000.json
+WARNING_URL = 〇〇
+""" # ワーク1：変数
+
+
+
 
 # ────────────────────────────────
 # サンプルデータの読み込み
@@ -133,26 +156,44 @@ def get_fujisawa_warnings():
         report_datetime = warning_data.get("reportDatetime", "")
         if report_datetime:
             try:
-                """ # 第2問：条件分岐について学ぼう！
-                # 以下のコードの〇〇の中に、A~Dの中から適切なものを選んで貼り付けてください
-                # A) elif
-                # B) else
-                # C) if
-                # D) while
-                # ヒント：「もし〜なら」を指す言葉。
-                # ISO形式の時刻をパース（例: "2025-01-15T04:14:00+09:00"）
-                if report_datetime.endswith('Z'):
-                    # UTC時刻の場合は+9時間してJSTに変換
+                
+                """"# ワーク2：条件分岐（if / elif / else）を使ってみよう！
+                # 下のコードは、時刻データ（report_datetime）の形式に応じて処理を変えるプログラムです。
+                # 下記の 〇〇 の中に、A〜Fの中から適切な内容を選んで貼り付けて、プログラムを完成させましょう。
+
+                # --- ヒント①：if / elif / else の使い方 ---
+                # if 条件1:
+                #     条件1に合うときの処理
+                # elif 条件2:
+                #     条件1に合わず、条件2に合うときの処理
+                # else:
+                #     上記のいずれにも合わなかったときの処理
+
+                # --- ヒント②：datetimeのパース方法 ---
+                # datetime.fromisoformat() を使うと、ISO形式の文字列をdatetimeオブジェクトに変換できます。
+                # ただし、タイムゾーン情報が含まれている場合は注意が必要です。
+
+                # --- 選択肢（A〜F） ---
+                # A) datetime.fromisoformat(report_datetime.replace('+09:00', ''))
+                # B) datetime.fromisoformat(report_datetime)
+                # C) report_datetime.endswith('Z')
+                # D) '+09:00' in report_datetime
+ 
+                # --- 並べ替え問題（〇〇に正しいものを貼り付けて完成させましょう） ---
+                if 〇〇:
+                    # 時刻データ（report_datetime）がUTC時刻(最後がZ）の場合は、+9時間してJSTに変換
                     utc_time = datetime.fromisoformat(report_datetime[:-1])
                     jst_time = utc_time + timedelta(hours=9)
-                elif '+09:00' in report_datetime:
-                    # 既にJST（+09:00）が含まれている場合はタイムゾーン部分を除去してパース
-                    jst_time = datetime.fromisoformat(report_datetime.replace('+09:00', ''))
+                elif 〇〇:
+                    #時刻データ（report_datetime） にJST（+09:00）が含まれている場合は、タイムゾーン部分を除去してパース
+                    jst_time = 〇〇
                 else:
                     # その他の形式はそのままパース
-                    jst_time = datetime.fromisoformat(report_datetime)
-                """ # 第2問：条件分岐
-                
+                    jst_time = 〇〇
+
+                """# ワーク2：条件分岐
+
+
                 formatted_time = jst_time.strftime("%Y年%m月%d日 %H:%M")
             except Exception as e:
                 formatted_time = report_datetime
@@ -289,29 +330,54 @@ def shelter_search():
             return render_template('shelter_search.html', error=True, message="地区を選択してください。", districts=FUJISAWA_DISTRICTS) # districts をテンプレートに渡す
 
         results = []
-        """ # 第3問：繰り返しについて学ぼう
-         # 以下のコードの〇〇の中に、A~Dの中から適切なものを選んで貼り付けてください
-         # ヒント：リストの中身を「一つずつ」取り出して処理したい場合に使うのは何ですか？
-         # A) while
-         # B) for
-         # C) if
-         # D) def
-        for s in shelters:
-            if district and s.get('district') != district: # pref と city の代わりに district でフィルタリング
-                continue
-            results.append(s)
         
+
+        """ # ワーク3：for文の構造と中身を理解しよう！
+
+        # 以下は、避難所のリスト（shelters）から、指定された地区（district）に一致するものだけを選び出す処理です。
+        # 〇〇の中に、A〜Fの中から適切なものを選んで貼り付けて、プログラムを完成させましょう。
+
+        # --- ヒント：for文の基本構文 ---
+        # for 変数 in リスト:
+        #     条件があるときは if を使う
+        #     条件に合わないときは continue でスキップできる
+        #     条件に合ったら、結果リストに追加する
+
+        # --- 選択肢（A〜F）使用しない選択肢もあります ---
+        # A) for s in shelters         
+        # B) for district in results   
+        # C) if district and s.get('district') != district  
+        # D) results.append(s)         
+        # E) def shelter_filter(s):    
+        # F) continue                  
+
+        # --- コード（適切な選択肢を貼り付けてください） ---
+
+        # 【1】リストsheltersから、避難所sを1つずつ取り出す
+        〇〇:  
+
+            # 【2】districtが指定されていて、sの'district'と違う場合はスキップ
+            〇〇:
+
+                # 【3】スキップ（次のループへ）
+                〇〇
+
+            # 【4】条件に合う避難所を結果リストに追加
+            〇〇
+
+
+        # 【5】結果がなかったときとあったときで、表示を分ける（この部分は完成済み）
         if not results:
-            # 該当する避難所がない場合
             return render_template('shelter_search.html',
-                                 error=True,
-                                 message="該当する避難所がありません。",
-                                 searched_district=district, # searched_pref と searched_city を searched_district に変更
-                                 districts=FUJISAWA_DISTRICTS) # districts をテンプレートに渡す
+                                error=True,
+                                message="該当する避難所がありません。",
+                                searched_district=district,
+                                districts=FUJISAWA_DISTRICTS)
         else:
-            # 結果がある場合は検索結果ページへ
-            return render_template('search_results.html', results=results, searched_district=district) # searched_district をテンプレートに渡す
-        """ # 第3問：繰り返し
+            return render_template('search_results.html',
+                                results=results,
+                                searched_district=district)
+        """
 
     # GETリクエストの場合は通常のフォームを表示
     return render_template('shelter_search.html', districts=FUJISAWA_DISTRICTS) # districts をテンプレートに渡す
@@ -339,39 +405,51 @@ def shelter_register():
         designated_shelter = bool(request.form.get('designated_shelter'))
         pet_space = bool(request.form.get('pet_space'))
         barrier_free_toilet = bool(request.form.get('barrier_free_toilet'))
+                
+                
         
-        """ # 第5問：リスト
-        # 以下のコードの2つの〇〇の中に、A~Dの中から適切なものを選んで貼り付けてください
-        # ヒント：辞書を表現する記号は何ですか？
-        # A) [,]
-        # B) (,)
-        # C) {,}
-        # D) <,>
-        # 必須項目チェック
-        if not all([name, district, address, latitude, longitude]):
-            return render_template('shelter_register.html', error=True, message="必須項目が入力されていません。", districts=FUJISAWA_DISTRICTS)        
+        """ # ワーク5：リストの文法と、チェック順の理由を考えよう！
 
-        # 緯度経度の数値変換とバリデーション
+        # このプログラムは、避難所登録フォームで入力された5項目がすべて入力されているかをチェックします。
+        # すべての値が存在しているかどうかを、Pythonでは `all()` とリストを組み合わせて確認できます。
+
+        # --- ヒント ---
+        # ・リストは [ 値1, 値2, ... ] のように角カッコで囲み、カンマで区切って書きます。
+        # ・空の文字列 '' や None がリストに含まれていると、 `all()` は False を返します。
+
+        # --- 問題①：次の7つの要素を並べ替えて、正しいリストの構文にしてください（〇〇に記入） ---
+        # 選択肢：name, ], district, [, address, latitude, longitude
+
+        if not all(〇〇):
+            return render_template('shelter_register.html',
+                                error=True,
+                                message="必須項目が入力されていません。",
+                                districts=FUJISAWA_DISTRICTS)
+
+        # --- 問題②：このチェックを最初に行うべき理由を、下の〇〇に書いてください（20〜40字目安） ---
+
+        # チェック順の理由：〇〇
+
+        # --- 緯度経度のバリデーション処理（以下は完成済み） ---
         try:
             lat = float(latitude)
             lon = float(longitude)
-            
-            # 藤沢市周辺の座標範囲チェック (緯度: 35.2-35.5, 経度: 139.3-139.6)
+
             if not (35.2 <= lat <= 35.5) or not (139.3 <= lon <= 139.6):
-                return render_template('shelter_register.html', error=True, message="緯度・経度は藤沢市周辺の座標を入力してください。", districts=FUJISAWA_DISTRICTS)
-                
+                return render_template('shelter_register.html',
+                                    error=True,
+                                    message="緯度・経度は藤沢市周辺の座標を入力してください。",
+                                    districts=FUJISAWA_DISTRICTS)
+
         except ValueError:
-            return render_template('shelter_register.html', error=True, message="緯度・経度は正しい数値で入力してください。", districts=FUJISAWA_DISTRICTS)
-        """ # 第5問：リスト
-            
-        # 新しい避難所データを作成
-        """ # 第4問：簡単な機能追加
-        # 以下のコードの2つの〇〇の中に、A~Dの中から適切なものを選んで貼り付けてください
-        # ヒント：辞書を表現する記号は何ですか？
-        # A) [,]
-        # B) (,)
-        # C) {,}
-        # D) <,>
+            return render_template('shelter_register.html',
+                                error=True,
+                                message="緯度・経度は正しい数値で入力してください。",
+                                districts=FUJISAWA_DISTRICTS)
+
+        """ 
+
+        
         new_shelter = {
             'id': len(shelters) + 1,
             'name': name,
@@ -387,7 +465,7 @@ def shelter_register():
             'lat': lat,  # 緯度を追加
             'lon': lon   # 経度を追加
         }
-        """ # 第4問：辞書
+        
         
         # メモリ上のリストに追加
         shelters.append(new_shelter)
