@@ -34,8 +34,8 @@ app.secret_key = 'your-secret-key-here'
         # 次の条件に合うように、自分で辞書を完成させてください。
 
         # 【1】変数名は → ADMIN_CREDENTIALS
-        # 【2】'admin' という管理者のパスワードは 'pass123'
-        # 【3】'manager' という管理者のパスワードは 'secret456'
+        # 【2】'admin' という管理者のパスワードは 'password123'
+        # 【3】'manager' という管理者のパスワードは 'shelter2025'
         # 【4】すべての形式・記号（: , { }）を正しく使いましょう
 
         # ↓ ここに完成させて書いてください
