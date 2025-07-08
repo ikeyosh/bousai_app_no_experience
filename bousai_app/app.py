@@ -159,7 +159,7 @@ def get_fujisawa_warnings():
                 
                 """"# ワーク2：条件分岐（if / elif / else）を使ってみよう！
                 # 下のコードは、時刻データ（report_datetime）の形式に応じて処理を変えるプログラムです。
-                # 下記の 〇〇 の中に、A〜Fの中から適切な内容を選んで貼り付けて、プログラムを完成させましょう。
+                # 下記の 〇〇 の中に、A〜Dの中から適切な内容を選んで貼り付けて、プログラムを完成させましょう。
 
                 # --- ヒント①：if / elif / else の使い方 ---
                 # if 条件1:
@@ -173,7 +173,7 @@ def get_fujisawa_warnings():
                 # datetime.fromisoformat() を使うと、ISO形式の文字列をdatetimeオブジェクトに変換できます。
                 # ただし、タイムゾーン情報が含まれている場合は注意が必要です。
 
-                # --- 選択肢（A〜F） ---
+                # --- 選択肢（A〜D） ---
                 # A) datetime.fromisoformat(report_datetime.replace('+09:00', ''))
                 # B) datetime.fromisoformat(report_datetime)
                 # C) report_datetime.endswith('Z')
